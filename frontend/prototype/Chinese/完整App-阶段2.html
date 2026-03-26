@@ -294,17 +294,41 @@
 
     function showRoute(route) {
       const normalized = normalizeRoute(route);
+      const hash = normalized === 'nexus' ? '' : '#' + normalized;
+      if (normalized === currentRoute && !pendingRoute) {
+        if (location.hash !== hash) {
+          history.replaceState(null, '', hash || (location.pathname + location.search));
+        }
+        frame.classList.remove('is-switching');
+        veil.classList.remove('is-visible');
+        bindFrameInteractions(normalized);
+        return;
+      }
       pendingRoute = normalized;
       frame.classList.add('is-switching');
       veil.classList.add('is-visible');
       const routeFile = routeFiles[normalized];
       if (routeFile) {
+        if (frame.getAttribute('src') === routeFile && frame.contentDocument?.readyState !== 'loading') {
+          finishRouteSwap(normalized);
+          return;
+        }
         frame.removeAttribute('srcdoc');
         frame.src = routeFile;
+        window.setTimeout(() => {
+          if (pendingRoute === normalized && frame.classList.contains('is-switching') && frame.contentDocument?.readyState !== 'loading') {
+            finishRouteSwap(normalized);
+          }
+        }, 520);
         return;
       }
       frame.removeAttribute('src');
       frame.srcdoc = pages[normalized];
+      window.setTimeout(() => {
+        if (pendingRoute === normalized && frame.classList.contains('is-switching') && frame.contentDocument?.readyState !== 'loading') {
+          finishRouteSwap(normalized);
+        }
+      }, 520);
     }
 
     frame.addEventListener('load', () => {

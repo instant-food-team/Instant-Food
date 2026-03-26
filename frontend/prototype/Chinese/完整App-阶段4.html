@@ -63,7 +63,7 @@
     }
 
     .stage4-frame.is-switching {
-      opacity: 0.08;
+      opacity: 1;
     }
 
     .stage4-veil {
@@ -79,7 +79,7 @@
     }
 
     .stage4-veil.is-visible {
-      opacity: 1;
+      opacity: 0;
     }
 
     .stage4-sheet-backdrop {
@@ -426,6 +426,90 @@
       return (readyState === "interactive" || readyState === "complete") && (hasChildren || hasVisibleText);
     }
 
+    function waitForFramePaint(targetWindow, frames = 2) {
+      const view = targetWindow || window;
+      return new Promise((resolve) => {
+        const step = (remaining) => {
+          if (remaining <= 0) {
+            resolve();
+            return;
+          }
+          view.requestAnimationFrame(() => step(remaining - 1));
+        };
+        step(frames);
+      });
+    }
+
+    function waitForRouteAssets(doc) {
+      if (!doc || !doc.body) {
+        return Promise.resolve();
+      }
+
+      const view = doc.defaultView || window;
+      const viewportHeight = view.innerHeight || doc.documentElement.clientHeight || 0;
+      const images = Array.from(doc.images || []).filter((img) => {
+        if (!img || !img.getBoundingClientRect) {
+          return false;
+        }
+        const rect = img.getBoundingClientRect();
+        return rect.width > 0 && rect.height > 0 && rect.bottom >= -40 && rect.top <= viewportHeight + 40;
+      });
+
+      if (!images.length) {
+        return Promise.resolve();
+      }
+
+      return Promise.allSettled(images.map((img) => new Promise((resolve) => {
+        let settled = false;
+        const finish = () => {
+          if (settled) {
+            return;
+          }
+          settled = true;
+          img.removeEventListener("load", finish);
+          img.removeEventListener("error", finish);
+          resolve();
+        };
+
+        img.loading = "eager";
+        img.decoding = "sync";
+
+        if (img.complete) {
+          if (typeof img.decode === "function") {
+            img.decode().catch(() => {}).finally(finish);
+            window.setTimeout(finish, 320);
+            return;
+          }
+          finish();
+          return;
+        }
+
+        img.addEventListener("load", finish, { once: true });
+        img.addEventListener("error", finish, { once: true });
+        window.setTimeout(finish, 900);
+      })));
+    }
+
+    async function waitForVisualStability(doc) {
+      if (!doc) {
+        return;
+      }
+
+      try {
+        if (doc.fonts && doc.fonts.ready) {
+          await Promise.race([
+            doc.fonts.ready.catch(() => {}),
+            new Promise((resolve) => window.setTimeout(resolve, 480))
+          ]);
+        }
+      } catch (error) {
+        console.warn("stage4-fonts-wait-failed", error);
+      }
+
+      await waitForRouteAssets(doc);
+      await waitForFramePaint(doc.defaultView || window, 2);
+    }
+
     function resetFrameSwapState(route) {
       state.currentRoute = route;
       state.pendingRoute = null;
@@ -473,6 +557,7 @@
       if (route === state.currentRoute && frame.srcdoc) {
         history.replaceState(null, "", "#" + route);
         setTitle(route);
+        resetFrameSwapState(route);
         return;
       }
 
@@ -494,6 +579,18 @@
       requestAnimationFrame(() => {
         frame.srcdoc = pages[route];
       });
+
+      window.setTimeout(() => {
+        if (state.pendingRoute !== route || !frame.classList.contains("is-switching")) {
+          return;
+        }
+        const doc = frame.contentDocument;
+        if (!isFrameDocumentReady(doc)) {
+          return;
+        }
+        bindRouteView(doc, route);
+        resetFrameSwapState(route);
+      }, 640);
     }
 
     function handleLocalRoute(targetRoute, event, options = {}) {
@@ -1043,7 +1140,31 @@
 
       const main = doc.querySelector("main");
       if (main) {
-        const coverSrc = "../../assets/backgrounds/1a9c1cd344d6e4f01783436808a33ec0.jpg";
+        const avatarDefaultSrc = "../../assets/backgrounds/1e3da84973873f9f9c68afa3177bbd24.jpg";
+        const coverDefaultSrc = "../../assets/backgrounds/1a9c1cd344d6e4f01783436808a33ec0.jpg";
+        const normalizeSettingsAssetSrc = (rawSrc, fallbackSrc) => {
+          const value = String(rawSrc || "").trim();
+          if (!value) {
+            return fallbackSrc;
+          }
+          if (value.startsWith("assets/backgrounds/")) {
+            return `../../${value}`;
+          }
+          return value;
+        };
+        const ensureImageFallback = (img, fallbackSrc) => {
+          if (!img || img.dataset.settingsFallbackBound === "true") {
+            return;
+          }
+          img.dataset.settingsFallbackBound = "true";
+          img.addEventListener("error", () => {
+            const normalizedFallback = normalizeSettingsAssetSrc(fallbackSrc, fallbackSrc);
+            if (img.getAttribute("src") !== normalizedFallback) {
+              img.setAttribute("src", normalizedFallback);
+            }
+          });
+        };
+        const coverSrc = normalizeSettingsAssetSrc(coverDefaultSrc, coverDefaultSrc);
         main.classList.add("settings-main");
         const topSections = Array.from(main.children).filter((node) => node.tagName === "SECTION");
         const profileSection = topSections[0];
@@ -1051,7 +1172,7 @@
           const profileImage = profileSection.querySelector("img");
           const profileName = profileSection.querySelector("h2")?.textContent?.trim() || "杨";
           const profileMeta = profileSection.querySelector("p")?.textContent?.trim() || "身体风味等级";
-          const imageSrc = profileImage?.getAttribute("src") || "../../assets/backgrounds/1e3da84973873f9f9c68afa3177bbd24.jpg";
+          const imageSrc = normalizeSettingsAssetSrc(profileImage?.getAttribute("src"), avatarDefaultSrc);
           const imagePos = profileImage?.style?.objectPosition || "center 18%";
 
           const heroSection = doc.createElement("section");
@@ -1071,8 +1192,21 @@
         }
 
         const heroCover = main.querySelector(".settings-hero-cover");
-        if (heroCover && heroCover.getAttribute("src") !== coverSrc) {
-          heroCover.setAttribute("src", coverSrc);
+        if (heroCover) {
+          const normalizedHeroCover = normalizeSettingsAssetSrc(heroCover.getAttribute("src"), coverSrc);
+          if (heroCover.getAttribute("src") !== normalizedHeroCover) {
+            heroCover.setAttribute("src", normalizedHeroCover);
+          }
+          ensureImageFallback(heroCover, coverDefaultSrc);
+        }
+
+        const heroAvatar = main.querySelector(".settings-avatar");
+        if (heroAvatar) {
+          const normalizedHeroAvatar = normalizeSettingsAssetSrc(heroAvatar.getAttribute("src"), avatarDefaultSrc);
+          if (heroAvatar.getAttribute("src") !== normalizedHeroAvatar) {
+            heroAvatar.setAttribute("src", normalizedHeroAvatar);
+          }
+          ensureImageFallback(heroAvatar, avatarDefaultSrc);
         }
 
         const sections = Array.from(main.children).filter((node) => node.tagName === "SECTION");
@@ -1147,7 +1281,7 @@
       }
     }
 
-    frame.addEventListener("load", () => {
+    frame.addEventListener("load", async () => {
       const route = state.pendingRoute || state.currentRoute;
 
       let doc = null;
@@ -1165,13 +1299,18 @@
         console.warn("stage4-frame-empty-giveup", { route, reason });
       }
 
-      resetFrameSwapState(route);
-
       if (!isFrameDocumentReady(doc)) {
         return;
       }
 
       bindRouteView(doc, route);
+      await waitForVisualStability(doc);
+
+      if (state.pendingRoute && state.pendingRoute !== route) {
+        return;
+      }
+
+      resetFrameSwapState(route);
       requestAnimationFrame(() => {
         restoreScrollPosition(route);
       });
