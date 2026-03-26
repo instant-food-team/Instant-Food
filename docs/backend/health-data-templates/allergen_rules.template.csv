@@ -1,0 +1,4 @@
+id,ingredient_id,allergen_code,allergen_name_zh,match_type,evidence_note,severity_level,source_authority,source_url,is_active
+allergen_shrimp_shellfish_001,ingr_shrimp_raw_001,shellfish,甲壳类,direct,虾属于甲壳类水产。,warning,FDA,https://www.fda.gov/food/nutrition-food-labeling-and-critical-foods/food-allergies,true
+allergen_milk_dairy_001,ingr_milk_whole_001,milk,乳,direct,牛奶属于 FDA 主要过敏原中的 milk。,warning,FDA,https://www.fda.gov/food/nutrition-food-labeling-and-critical-foods/food-allergies,true
+allergen_sesame_001,ingr_sesame_001,sesame,芝麻,direct,芝麻属于 FDA 主要过敏原。,warning,FDA,https://www.fda.gov/food/nutrition-food-labeling-and-critical-foods/food-allergies,true

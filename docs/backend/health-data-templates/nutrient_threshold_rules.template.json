@@ -1,0 +1,53 @@
+[
+  {
+    "id": "rule_high_sodium_per_serving_001",
+    "rule_code": "HIGH_SODIUM_PER_SERVING",
+    "rule_name": "每份高钠",
+    "nutrient_key": "sodium",
+    "evaluation_basis": "percent_daily_value",
+    "operator": ">=",
+    "threshold_value": 20,
+    "threshold_upper_value": null,
+    "unit": "percent",
+    "severity_level": "warning",
+    "output_label": "高盐",
+    "output_copy": "该份量钠含量偏高，建议控制频率或减少额外调味。",
+    "source_authority": "FDA",
+    "source_url": "https://www.fda.gov/food/new-nutrition-facts-label/daily-value-new-nutrition-and-supplement-facts-labels",
+    "is_active": true
+  },
+  {
+    "id": "rule_high_saturated_fat_per_serving_001",
+    "rule_code": "HIGH_SATURATED_FAT_PER_SERVING",
+    "rule_name": "每份高饱和脂肪",
+    "nutrient_key": "saturated_fat",
+    "evaluation_basis": "percent_daily_value",
+    "operator": ">=",
+    "threshold_value": 20,
+    "threshold_upper_value": null,
+    "unit": "percent",
+    "severity_level": "warning",
+    "output_label": "高脂",
+    "output_copy": "该份量饱和脂肪偏高，建议减少高脂酱汁或油炸处理。",
+    "source_authority": "FDA",
+    "source_url": "https://www.fda.gov/food/new-nutrition-facts-label/daily-value-new-nutrition-and-supplement-facts-labels",
+    "is_active": true
+  },
+  {
+    "id": "rule_heavy_meal_kcal_001",
+    "rule_code": "HEAVY_MEAL_KCAL",
+    "rule_name": "偏高热量餐",
+    "nutrient_key": "kcal",
+    "evaluation_basis": "per_recipe",
+    "operator": ">=",
+    "threshold_value": 700,
+    "threshold_upper_value": null,
+    "unit": "kcal",
+    "severity_level": "caution",
+    "output_label": "偏高热量",
+    "output_copy": "该料理预计总热量较高，更适合作为正餐而非夜宵。",
+    "source_authority": "PROJECT_RULE",
+    "source_url": "https://www.who.int/en/news-room/fact-sheets/detail/healthy-diet",
+    "is_active": true
+  }
+]

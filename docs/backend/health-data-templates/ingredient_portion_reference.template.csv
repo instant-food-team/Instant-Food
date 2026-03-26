@@ -1,0 +1,3 @@
+id,ingredient_id,portion_label,portion_grams,portion_type,is_default,scene_hint,confidence_level,source_dataset,updated_at
+portion_chicken_breast_default_001,ingr_chicken_breast_raw_001,1 piece,120,piece,true,protein_main,medium,foundation_foods,2026-03-14T00:00:00+08:00
+portion_shrimp_default_001,ingr_shrimp_raw_001,1 serving,85,serving,true,protein_main,medium,fndds,2026-03-14T00:00:00+08:00

@@ -1,0 +1,4 @@
+id,rule_code,rule_name,nutrient_key,evaluation_basis,operator,threshold_value,threshold_upper_value,unit,severity_level,output_label,output_copy,source_authority,source_url,is_active
+rule_high_sodium_per_serving_001,HIGH_SODIUM_PER_SERVING,每份高钠,sodium,percent_daily_value,>=,20,,percent,warning,高盐,该份量钠含量偏高，建议控制频率或减少额外调味。,FDA,https://www.fda.gov/food/new-nutrition-facts-label/daily-value-new-nutrition-and-supplement-facts-labels,true
+rule_high_saturated_fat_per_serving_001,HIGH_SATURATED_FAT_PER_SERVING,每份高饱和脂肪,saturated_fat,percent_daily_value,>=,20,,percent,warning,高脂,该份量饱和脂肪偏高，建议减少高脂酱汁或油炸处理。,FDA,https://www.fda.gov/food/new-nutrition-facts-label/daily-value-new-nutrition-and-supplement-facts-labels,true
+rule_heavy_meal_kcal_001,HEAVY_MEAL_KCAL,偏高热量餐,kcal,per_recipe,>=,700,,kcal,caution,偏高热量,该料理预计总热量较高，更适合作为正餐而非夜宵。,PROJECT_RULE,https://www.who.int/en/news-room/fact-sheets/detail/healthy-diet,true

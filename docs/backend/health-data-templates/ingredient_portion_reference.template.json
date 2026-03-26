@@ -1,0 +1,26 @@
+[
+  {
+    "id": "portion_chicken_breast_default_001",
+    "ingredient_id": "ingr_chicken_breast_raw_001",
+    "portion_label": "1 piece",
+    "portion_grams": 120,
+    "portion_type": "piece",
+    "is_default": true,
+    "scene_hint": "protein_main",
+    "confidence_level": "medium",
+    "source_dataset": "foundation_foods",
+    "updated_at": "2026-03-14T00:00:00+08:00"
+  },
+  {
+    "id": "portion_shrimp_default_001",
+    "ingredient_id": "ingr_shrimp_raw_001",
+    "portion_label": "1 serving",
+    "portion_grams": 85,
+    "portion_type": "serving",
+    "is_default": true,
+    "scene_hint": "protein_main",
+    "confidence_level": "medium",
+    "source_dataset": "fndds",
+    "updated_at": "2026-03-14T00:00:00+08:00"
+  }
+]

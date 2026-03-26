@@ -1,0 +1,33 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Node / frontend
+node_modules/
+dist/
+build/
+frontend/miniprogram/dist/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# Local tool state
+.codex-tools/
+.playwright-cli/
+
+# Generated output
+output/
+archive/browser-profiles/
+
+# Temporary workspace files
+tmp/*
+!tmp/README.md
+
+# Logs
+*.log
