@@ -1174,6 +1174,8 @@
           "  position: relative;",
           "  overflow: hidden;",
           "  isolation: isolate;",
+          "  perspective: 1200px;",
+          "  transform-style: preserve-3d;",
           "}",
           ".stage-root[data-shell-stage1-animating='true'] {",
           "  pointer-events: none;",
@@ -1193,6 +1195,8 @@
           "}",
           ".stage-view.shell-stage1-overlay .phone-shell {",
           "  will-change: transform, opacity;",
+          "  transform-origin: center center;",
+          "  backface-visibility: hidden;",
           "}",
           buildTopChromeFixCss()
         ].join("\n");
@@ -2689,25 +2693,29 @@
         targetView.style.pointerEvents = "none";
 
         const reverse = options.direction === "back";
-        const easing = "cubic-bezier(0.32, 0.72, 0, 1)";
-        const duration = reverse ? 300 : 340;
+        const easing = "cubic-bezier(0.22, 1, 0.36, 1)";
+        const duration = reverse ? 460 : 500;
         const currentFrames = reverse
           ? [
-              { transform: "translate3d(0, 0, 0)", opacity: 1, filter: "brightness(1)", offset: 0 },
-              { transform: "translate3d(28px, 0, 0)", opacity: 0.72, filter: "brightness(0.96)", offset: 1 }
+              { transform: "translate3d(0, 0, 0) scale(1)", opacity: 1, filter: "blur(0px) brightness(1)", offset: 0 },
+              { transform: "translate3d(8px, 0, 0) scale(0.992)", opacity: 0.9, filter: "blur(0.55px) brightness(0.985)", offset: 0.58 },
+              { transform: "translate3d(18px, 0, 0) scale(0.978)", opacity: 0.74, filter: "blur(1.4px) brightness(0.94)", offset: 1 }
             ]
           : [
-              { transform: "translate3d(0, 0, 0)", opacity: 1, filter: "brightness(1)", offset: 0 },
-              { transform: "translate3d(-34px, 0, 0)", opacity: 0.74, filter: "brightness(0.95)", offset: 1 }
+              { transform: "translate3d(0, 0, 0) scale(1)", opacity: 1, filter: "blur(0px) brightness(1)", offset: 0 },
+              { transform: "translate3d(-8px, 0, 0) scale(0.992)", opacity: 0.9, filter: "blur(0.55px) brightness(0.985)", offset: 0.58 },
+              { transform: "translate3d(-18px, 0, 0) scale(0.978)", opacity: 0.74, filter: "blur(1.4px) brightness(0.94)", offset: 1 }
             ];
         const targetFrames = reverse
           ? [
-              { transform: "translate3d(-56px, 0, 0)", opacity: 0.7, filter: "brightness(0.96)", offset: 0 },
-              { transform: "translate3d(0, 0, 0)", opacity: 1, filter: "brightness(1)", offset: 1 }
+              { transform: "translate3d(-26px, 0, 0) scale(1.036)", opacity: 0, filter: "blur(8px) brightness(1.06)", offset: 0 },
+              { transform: "translate3d(3px, 0, 0) scale(0.997)", opacity: 0.92, filter: "blur(0.85px) brightness(1.01)", offset: 0.64 },
+              { transform: "translate3d(0, 0, 0) scale(1)", opacity: 1, filter: "blur(0px) brightness(1)", offset: 1 }
             ]
           : [
-              { transform: "translate3d(56px, 0, 0)", opacity: 0.7, filter: "brightness(0.96)", offset: 0 },
-              { transform: "translate3d(0, 0, 0)", opacity: 1, filter: "brightness(1)", offset: 1 }
+              { transform: "translate3d(26px, 0, 0) scale(1.036)", opacity: 0, filter: "blur(8px) brightness(1.06)", offset: 0 },
+              { transform: "translate3d(-3px, 0, 0) scale(0.997)", opacity: 0.92, filter: "blur(0.85px) brightness(1.01)", offset: 0.64 },
+              { transform: "translate3d(0, 0, 0) scale(1)", opacity: 1, filter: "blur(0px) brightness(1)", offset: 1 }
             ];
 
         try {
