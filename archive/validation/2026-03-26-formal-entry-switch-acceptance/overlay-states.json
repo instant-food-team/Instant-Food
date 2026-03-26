@@ -1,0 +1,146 @@
+[
+  {
+    "hash": "#stage1",
+    "settled": true,
+    "state": {
+      "hash": "#stage1",
+      "stage": "stage1",
+      "shellSwitching": false,
+      "s2Switching": false,
+      "s2VeilVisible": false,
+      "s2VeilOpacity": 0,
+      "s4Switching": false,
+      "s4VeilVisible": false,
+      "s4VeilOpacity": 0,
+      "s2Ready": false,
+      "s3Ready": false,
+      "s4Ready": false
+    }
+  },
+  {
+    "hash": "#stage1/auth",
+    "settled": true,
+    "state": {
+      "hash": "#stage1/auth",
+      "stage": "stage1",
+      "shellSwitching": false,
+      "s2Switching": false,
+      "s2VeilVisible": false,
+      "s2VeilOpacity": 0,
+      "s4Switching": false,
+      "s4VeilVisible": false,
+      "s4VeilOpacity": 0,
+      "s2Ready": false,
+      "s3Ready": false,
+      "s4Ready": false
+    }
+  },
+  {
+    "hash": "#stage2",
+    "settled": true,
+    "state": {
+      "hash": "#stage2",
+      "stage": "stage2",
+      "shellSwitching": false,
+      "s2Switching": false,
+      "s2VeilVisible": false,
+      "s2VeilOpacity": 0,
+      "s4Switching": false,
+      "s4VeilVisible": false,
+      "s4VeilOpacity": 0,
+      "s2Ready": true,
+      "s3Ready": false,
+      "s4Ready": false
+    }
+  },
+  {
+    "hash": "#stage2/camera",
+    "settled": true,
+    "state": {
+      "hash": "#stage2/camera",
+      "stage": "stage2",
+      "shellSwitching": false,
+      "s2Switching": false,
+      "s2VeilVisible": false,
+      "s2VeilOpacity": 0,
+      "s4Switching": false,
+      "s4VeilVisible": false,
+      "s4VeilOpacity": 0,
+      "s2Ready": true,
+      "s3Ready": false,
+      "s4Ready": false
+    }
+  },
+  {
+    "hash": "#stage3",
+    "settled": true,
+    "state": {
+      "hash": "#stage3",
+      "stage": "stage3",
+      "shellSwitching": false,
+      "s2Switching": false,
+      "s2VeilVisible": false,
+      "s2VeilOpacity": 0,
+      "s4Switching": false,
+      "s4VeilVisible": false,
+      "s4VeilOpacity": 0,
+      "s2Ready": false,
+      "s3Ready": true,
+      "s4Ready": false
+    }
+  },
+  {
+    "hash": "#stage4/community",
+    "settled": true,
+    "state": {
+      "hash": "#stage4/community",
+      "stage": "stage4",
+      "shellSwitching": false,
+      "s2Switching": false,
+      "s2VeilVisible": false,
+      "s2VeilOpacity": 0,
+      "s4Switching": false,
+      "s4VeilVisible": false,
+      "s4VeilOpacity": 0,
+      "s2Ready": false,
+      "s3Ready": false,
+      "s4Ready": true
+    }
+  },
+  {
+    "hash": "#stage4/archive",
+    "settled": true,
+    "state": {
+      "hash": "#stage4/archive",
+      "stage": "stage4",
+      "shellSwitching": false,
+      "s2Switching": false,
+      "s2VeilVisible": false,
+      "s2VeilOpacity": 0,
+      "s4Switching": false,
+      "s4VeilVisible": false,
+      "s4VeilOpacity": 0,
+      "s2Ready": false,
+      "s3Ready": false,
+      "s4Ready": true
+    }
+  },
+  {
+    "hash": "#stage4/settings",
+    "settled": true,
+    "state": {
+      "hash": "#stage4/settings",
+      "stage": "stage4",
+      "shellSwitching": false,
+      "s2Switching": false,
+      "s2VeilVisible": false,
+      "s2VeilOpacity": 0,
+      "s4Switching": false,
+      "s4VeilVisible": false,
+      "s4VeilOpacity": 0,
+      "s2Ready": false,
+      "s3Ready": false,
+      "s4Ready": true
+    }
+  }
+]

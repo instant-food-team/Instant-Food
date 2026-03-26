@@ -31,3 +31,14 @@ tmp/*
 
 # Logs
 *.log
+
+# Validation archive policy
+# Default ignore all validation artifacts to keep Git history clean.
+archive/validation/**
+# Keep index and current baseline acceptance report files.
+!archive/validation/
+!archive/validation/README.md
+!archive/validation/2026-03-26-formal-entry-switch-acceptance/
+!archive/validation/2026-03-26-formal-entry-switch-acceptance/overlay-states.json
+!archive/validation/2026-03-26-formal-entry-switch-acceptance/validation-result.json
+!archive/validation/2026-03-26-formal-entry-switch-acceptance/validation-summary.md

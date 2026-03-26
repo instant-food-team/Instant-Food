@@ -1,0 +1,85 @@
+{
+  "generatedAt": "2026-03-26T12:45:18.924Z",
+  "formalEntry": "file:///C:/Users/Yang/Desktop/%E6%8B%8D%E7%AB%8B%E9%A3%9F/frontend/index.html",
+  "shellUrl": "file:///C:/Users/Yang/Desktop/%E6%8B%8D%E7%AB%8B%E9%A3%9F/frontend/prototype/Chinese/%E5%AE%8C%E6%95%B4App-%E6%80%BB%E8%A3%85_%E7%9C%9F%E5%AE%9E%E9%98%B6%E6%AE%B5%E7%9B%B4%E8%BF%9E%E7%89%88.html",
+  "expectedShellPath": "/prototype/Chinese/%E5%AE%8C%E6%95%B4App-%E6%80%BB%E8%A3%85_%E7%9C%9F%E5%AE%9E%E9%98%B6%E6%AE%B5%E7%9B%B4%E8%BF%9E%E7%89%88.html",
+  "screenshots": [
+    "01-formal-entry-redirect.png",
+    "02-stage1-onboarding.png",
+    "03-stage1-after-drag.png",
+    "04-stage2-home.png",
+    "05-stage2-camera.png",
+    "06-stage2-after-camera-close.png",
+    "07-stage3-main.png",
+    "08-stage4-community.png",
+    "09-stage4-archive.png",
+    "10-stage4-settings.png"
+  ],
+  "checks": [
+    {
+      "id": "formal-entry-redirect-to-shell",
+      "level": "P0",
+      "pass": true,
+      "detail": "{\"href\":\"file:///C:/Users/Yang/Desktop/%E6%8B%8D%E7%AB%8B%E9%A3%9F/frontend/prototype/Chinese/%E5%AE%8C%E6%95%B4App-%E6%80%BB%E8%A3%85_%E7%9C%9F%E5%AE%9E%E9%98%B6%E6%AE%B5%E7%9B%B4%E8%BF%9E%E7%89%88.html#stage1\"}"
+    },
+    {
+      "id": "route-stage1-onboarding-ready",
+      "level": "P0",
+      "pass": true,
+      "detail": "{\"hash\":\"#stage1\",\"stage\":\"stage1\",\"shellSwitching\":false,\"s2Switching\":false,\"s2VeilVisible\":false,\"s2VeilOpacity\":0,\"s4Switching\":false,\"s4VeilVisible\":false,\"s4VeilOpacity\":0,\"s2Ready\":false,\"s3Ready\":false,\"s4Ready\":false}"
+    },
+    {
+      "id": "stage1-drag-follow",
+      "level": "P0",
+      "pass": true,
+      "detail": "{\"before\":0,\"after\":140,\"authVisible\":true}"
+    },
+    {
+      "id": "stage1-login-to-stage2",
+      "level": "P0",
+      "pass": true,
+      "detail": "{\"hash\":\"#stage2\",\"stage\":\"stage2\",\"shellSwitching\":false,\"s2Switching\":false,\"s2VeilVisible\":false,\"s2VeilOpacity\":0,\"s4Switching\":false,\"s4VeilVisible\":false,\"s4VeilOpacity\":0,\"s2Ready\":true,\"s3Ready\":false,\"s4Ready\":false}"
+    },
+    {
+      "id": "stage2-camera-close-x",
+      "level": "P0",
+      "pass": true,
+      "detail": "{\"hash\":\"#stage2\",\"stage\":\"stage2\",\"shellSwitching\":false,\"s2Switching\":false,\"s2VeilVisible\":false,\"s2VeilOpacity\":0,\"s4Switching\":false,\"s4VeilVisible\":false,\"s4VeilOpacity\":0,\"s2Ready\":true,\"s3Ready\":false,\"s4Ready\":false}"
+    },
+    {
+      "id": "stage3-chip-clickable",
+      "level": "P1",
+      "pass": true,
+      "detail": "{\"hash\":\"#stage3\",\"stage\":\"stage3\",\"shellSwitching\":false,\"s2Switching\":false,\"s2VeilVisible\":false,\"s2VeilOpacity\":0,\"s4Switching\":false,\"s4VeilVisible\":false,\"s4VeilOpacity\":0,\"s2Ready\":false,\"s3Ready\":true,\"s4Ready\":false}"
+    },
+    {
+      "id": "route-stage4-community-ready",
+      "level": "P1",
+      "pass": true,
+      "detail": "{\"hash\":\"#stage4/community\",\"stage\":\"stage4\",\"shellSwitching\":false,\"s2Switching\":false,\"s2VeilVisible\":false,\"s2VeilOpacity\":0,\"s4Switching\":false,\"s4VeilVisible\":false,\"s4VeilOpacity\":0,\"s2Ready\":false,\"s3Ready\":false,\"s4Ready\":true}"
+    },
+    {
+      "id": "stage4-archive-filter-toggle",
+      "level": "P1",
+      "pass": true,
+      "detail": "{\"hash\":\"#stage4/archive\",\"stage\":\"stage4\",\"shellSwitching\":false,\"s2Switching\":false,\"s2VeilVisible\":false,\"s2VeilOpacity\":0,\"s4Switching\":false,\"s4VeilVisible\":false,\"s4VeilOpacity\":0,\"s2Ready\":false,\"s3Ready\":false,\"s4Ready\":true}"
+    },
+    {
+      "id": "stage4-settings-avatar-cover-loaded",
+      "level": "P0",
+      "pass": true,
+      "detail": "{\"ok\":true,\"avatar\":{\"w\":1080,\"h\":1620},\"cover\":{\"w\":735,\"h\":490}}"
+    },
+    {
+      "id": "switching-veil-not-stuck",
+      "level": "P0",
+      "pass": true,
+      "detail": "[{\"hash\":\"#stage1\",\"settled\":true,\"state\":{\"hash\":\"#stage1\",\"stage\":\"stage1\",\"shellSwitching\":false,\"s2Switching\":false,\"s2VeilVisible\":false,\"s2VeilOpacity\":0,\"s4Switching\":false,\"s4VeilVisible\":false,\"s4VeilOpacity\":0,\"s2Ready\":false,\"s3Ready\":false,\"s4Ready\":false}},{\"hash\":\"#stage1/auth\",\"settled\":true,\"state\":{\"hash\":\"#stage1/auth\",\"stage\":\"stage1\",\"shellSwitching\":false,\"s2Switching\":false,\"s2VeilVisible\":false,\"s2VeilOpacity\":0,\"s4Switching\":false,\"s4VeilVisible\":false,\"s4VeilOpacity\":0,\"s2Ready\":false,\"s3Ready\":false,\"s4Ready\":false}},{\"hash\":\"#stage2\",\"settled\":true,\"state\":{\"hash\":\"#stage2\",\"stage\":\"stage2\",\"shellSwitching\":false,\"s2Switching\":false,\"s2VeilVisible\":false,\"s2VeilOpacity\":0,\"s4Switching\":false,\"s4VeilVisible\":false,\"s4VeilOpacity\":0,\"s2Ready\":true,\"s3Ready\":false,\"s4Ready\":false}},{\"hash\":\"#stage2/camera\",\"settled\":true,\"state\":{\"hash\":\"#stage2/camera\",\"stage\":\"stage2\",\"shellSwitching\":false,\"s2Switching\":false,\"s2VeilVisible\":false,\"s2VeilOpacity\":0,\"s4Switching\":false,\"s4VeilVisible\":false,\"s4VeilOpacity\":0,\"s2Ready\":true,\"s3Ready\":false,\"s4Ready\":false}},{\"hash\":\"#stage3\",\"settled\":true,\"state\":{\"hash\":\"#stage3\",\"stage\":\"stage3\",\"shellSwitching\":false,\"s2Switching\":false,\"s2VeilVisible\":false,\"s2VeilOpacity\":0,\"s4Switching\":false,\"s4VeilVisible\":false,\"s4VeilOpacity\":0,\"s2Ready\":false,\"s3Ready\":true,\"s4Ready\":false}},{\"hash\":\"#stage4/community\",\"settled\":true,\"state\":{\"hash\":\"#stage4/community\",\"stage\":\"stage4\",\"shellSwitching\":false,\"s2Switching\":false,\"s2VeilVisible\":false,\"s2VeilOpacity\":0,\"s4Switching\":false,\"s4VeilVisible\":false,\"s4VeilOpacity\":0,\"s2Ready\":false,\"s3Ready\":false,\"s4Ready\":true}},{\"hash\":\"#stage4/archive\",\"settled\":true,\"state\":{\"hash\":\"#stage4/archive\",\"stage\":\"stage4\",\"shellSwitching\":false,\"s2Switching\":false,\"s2VeilVisible\":false,\"s2VeilOpacity\":0,\"s4Switching\":false,\"s4VeilVisible\":false,\"s4VeilOpacity\":0,\"s2Ready\":false,\"s3Ready\":false,\"s4Ready\":true}},{\"hash\":\"#stage4/settings\",\"settled\":true,\"state\":{\"hash\":\"#stage4/settings\",\"stage\":\"stage4\",\"shellSwitching\":false,\"s2Switching\":false,\"s2VeilVisible\":false,\"s2VeilOpacity\":0,\"s4Switching\":false,\"s4VeilVisible\":false,\"s4VeilOpacity\":0,\"s2Ready\":false,\"s3Ready\":false,\"s4Ready\":true}}]"
+    }
+  ],
+  "summary": {
+    "p0Fail": 0,
+    "p1Fail": 0,
+    "passed": true
+  }
+}
