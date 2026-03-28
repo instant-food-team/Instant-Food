@@ -17,10 +17,11 @@ class Settings(BaseSettings):
     # AI API 配置
     openai_api_key: Optional[str] = None
     anthropic_api_key: Optional[str] = None
+    gemini_api_key: Optional[str] = None
     
     # AI 模型配置
-    ai_model: str = "gpt-4o"
-    vision_model: str = "gpt-4o-mini"
+    ai_model: str = "gemini-1.5-flash"
+    vision_model: str = "gemini-1.5-flash"
     max_tokens: int = 4096
     temperature: float = 0.7
     
@@ -59,6 +60,9 @@ class Settings(BaseSettings):
     
     def has_anthropic(self) -> bool:
         return bool(self.anthropic_api_key)
+    
+    def has_gemini(self) -> bool:
+        return bool(self.gemini_api_key)
 
 
 # 全局配置实例
