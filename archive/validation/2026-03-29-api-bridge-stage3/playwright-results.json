@@ -1,0 +1,31 @@
+{
+  "generatedAt": "2026-03-29T09:27:08.163Z",
+  "mockApi": "http://127.0.0.1:8001",
+  "realApi": "http://127.0.0.1:8000",
+  "checks": {
+    "camera": {
+      "currentUrl": "http://127.0.0.1:4173/prototype/Chinese/%E5%88%86%E5%AD%90%E9%87%8D%E6%9E%84%E5%8F%B0.html",
+      "capturedImageDataUrlLength": 76163,
+      "passed": true
+    },
+    "stage3Standalone": {
+      "title": "香煎鸡胸佐番茄蒜香汁",
+      "saveButtonText": "\n已保存到档案馆\ncheck\n",
+      "generatedExists": true,
+      "hash": "#result",
+      "passed": true
+    },
+    "totalShellStage3": {
+      "title": "香煎鸡胸佐番茄蒜香汁",
+      "saveButtonText": "\n已保存到档案馆\ncheck\n",
+      "generatedExists": true,
+      "shellHash": "#stage3",
+      "passed": true
+    },
+    "realBackendErrorState": {
+      "title": "连接未完成",
+      "message": "Failed to fetch",
+      "passed": true
+    }
+  }
+}

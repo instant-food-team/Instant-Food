@@ -839,8 +839,10 @@
       <div class="home-indicator" aria-hidden="true"></div>
     </section>
   </main>
+  <script src="instant-food-api-bridge.js"></script>
   <script>
     (() => {
+      const bridge = window.InstantFoodApiBridge;
       const uploadPhotoButton = document.getElementById("uploadPhotoButton");
       const openGalleryButton = document.getElementById("openGalleryButton");
       const shutterButton = document.getElementById("shutterButton");
@@ -1186,21 +1188,47 @@
         updateStackPreview();
       }
 
+      function getCurrentPhoto() {
+        if (!state.photos.length) {
+          return null;
+        }
+
+        return state.photos[clampIndex(state.currentIndex)] || state.photos[state.photos.length - 1] || null;
+      }
+
+      function persistCurrentPhotoForGeneration() {
+        if (!bridge) {
+          return "";
+        }
+
+        const photo = getCurrentPhoto();
+        const dataUrl = bridge.extractPhotoDataUrl(photo);
+        bridge.writeCapturedImage(dataUrl);
+        return dataUrl;
+      }
+
       uploadPhotoButton.addEventListener("click", () => {
         galleryUploadInput.click();
       });
 
-      galleryUploadInput.addEventListener("change", (event) => {
+      galleryUploadInput.addEventListener("change", async (event) => {
         const files = Array.from(event.target.files || []).filter((file) => file.type.startsWith("image/"));
-        const uploads = files.map((file, index) => {
+        const uploads = await Promise.all(files.map(async (file, index) => {
           const objectUrl = URL.createObjectURL(file);
+          let dataUrl = "";
+          if (bridge) {
+            try {
+              dataUrl = await bridge.fileToDataUrl(file);
+            } catch (error) {}
+          }
           return {
             id: "upload-" + Date.now() + "-" + index,
             src: objectUrl,
             objectUrl,
-            kind: "upload"
+            kind: "upload",
+            dataUrl
           };
-        });
+        }));
 
         addPhotos(uploads);
         event.target.value = "";
@@ -1223,7 +1251,8 @@
           {
             id: "capture-" + Date.now(),
             src: capturedSrc,
-            kind: "capture"
+            kind: "capture",
+            dataUrl: capturedSrc
           }
         ]);
       });
@@ -1306,6 +1335,17 @@
       });
 
       const closeButton = document.querySelector(".icon-button.ghost");
+      const confirmButton = document.querySelector('.mode-pill[href="分子重构台.html"]');
+
+      if (confirmButton) {
+        confirmButton.addEventListener("click", () => {
+          if (bridge) {
+            bridge.clearGenerationResult();
+          }
+          persistCurrentPhotoForGeneration();
+        });
+      }
+
       if (closeButton) {
         closeButton.addEventListener("click", (event) => {
           event.preventDefault();

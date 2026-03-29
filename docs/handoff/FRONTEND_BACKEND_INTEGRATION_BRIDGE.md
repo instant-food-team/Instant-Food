@@ -438,6 +438,35 @@
 - 结果页主图字段优先级：`imageUrl` -> `boardPreview`
 - 保存档案封面字段优先级：`imageUrl` -> `boardPreview`
 
+### 8.1 当前前端已预留的 API 配置入口
+
+为避免每次联调都改页面源码，前端现在支持以下配置方式：
+
+- `localStorage.instantFoodApiBaseUrl`
+- `sessionStorage.instantFoodApiBaseUrl`
+- URL 查询参数 `?apiBaseUrl=...`
+- 全局变量 `window.__INSTANT_FOOD_API_BASE_URL__`
+
+推荐本地联调时直接在浏览器控制台执行：
+
+```js
+localStorage.setItem("instantFoodApiBaseUrl", "http://127.0.0.1:8000")
+```
+
+如果后端部署后有正式地址，也可以直接改成线上地址。
+
+### 8.2 当前前端已预留的用户标识入口
+
+保存档案时，如果前端没有接真实登录用户，默认会使用：
+
+- `frontend-demo-user`
+
+如果后端同学需要指定测试用户，可以通过以下方式覆盖：
+
+- `localStorage.instantFoodUserId`
+- `sessionStorage.instantFoodUserId`
+- URL 查询参数 `?userId=...`
+
 ## 9. 安全与密钥要求
 
 以下内容不允许出现在前端页面中：
@@ -471,4 +500,3 @@
 2. 在结果页改为消费 `generatedRecipeResult`
 3. 在保存动作接入 `POST /api/v1/archives`
 4. 在正式入口回归后，补做 H5 验收和归档
-
