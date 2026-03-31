@@ -1316,8 +1316,10 @@
     </div>
   </div>
 
+  <script src="instant-food-api-bridge.js"></script>
   <script>
     const shell = document.getElementById("loadingShell");
+    const bridge = window.InstantFoodApiBridge;
     const confirmButtons = [
       document.getElementById("bottomConfirm")
     ].filter(Boolean);
@@ -1336,7 +1338,7 @@
     const boardLoadingShell = document.querySelector(".board-loading-shell");
     const boardGeneratedImage = document.getElementById("boardGeneratedImage");
     const boardGenerationPlaceholder = document.getElementById("boardGenerationPlaceholder");
-    const STORAGE_KEY = "molecularReconstructSelection";
+    const STORAGE_KEY = bridge ? bridge.STORAGE_KEYS.selection : "molecularReconstructSelection";
     const LOADER_RADIUS = 52;
     const LOADER_CIRCUMFERENCE = 2 * Math.PI * LOADER_RADIUS;
 
@@ -1367,11 +1369,13 @@
       }
     ];
 
-    let index = 0;
-    let timer = null;
-    let completionTimer = null;
-    let displayProgress = 0;
-    let progressAnimationFrame = null;
+    const runtime = {
+      index: 0,
+      timer: null,
+      displayProgress: 0,
+      progressAnimationFrame: null,
+      requestInFlight: false
+    };
 
     loaderProgressCircle.style.strokeDasharray = LOADER_CIRCUMFERENCE;
     loaderProgressCircle.style.strokeDashoffset = LOADER_CIRCUMFERENCE;
@@ -1386,17 +1390,17 @@
 
     function setLoaderProgress(value, duration = 900) {
       const clamped = Math.max(0, Math.min(100, value));
-      const startValue = displayProgress;
+      const startValue = runtime.displayProgress;
       const delta = clamped - startValue;
 
-      if (progressAnimationFrame) {
-        cancelAnimationFrame(progressAnimationFrame);
-        progressAnimationFrame = null;
+      if (runtime.progressAnimationFrame) {
+        cancelAnimationFrame(runtime.progressAnimationFrame);
+        runtime.progressAnimationFrame = null;
       }
 
       if (duration <= 0 || delta === 0) {
-        displayProgress = clamped;
-        renderLoaderProgress(displayProgress);
+        runtime.displayProgress = clamped;
+        renderLoaderProgress(runtime.displayProgress);
         return Promise.resolve();
       }
 
@@ -1407,21 +1411,21 @@
           const elapsed = now - startTime;
           const progress = Math.min(elapsed / duration, 1);
           const eased = 1 - Math.pow(1 - progress, 3);
-          displayProgress = startValue + delta * eased;
-          renderLoaderProgress(displayProgress);
+          runtime.displayProgress = startValue + delta * eased;
+          renderLoaderProgress(runtime.displayProgress);
 
           if (progress < 1) {
-            progressAnimationFrame = requestAnimationFrame(tick);
+            runtime.progressAnimationFrame = requestAnimationFrame(tick);
             return;
           }
 
-          displayProgress = clamped;
-          renderLoaderProgress(displayProgress);
-          progressAnimationFrame = null;
+          runtime.displayProgress = clamped;
+          renderLoaderProgress(runtime.displayProgress);
+          runtime.progressAnimationFrame = null;
           resolve();
         }
 
-        progressAnimationFrame = requestAnimationFrame(tick);
+        runtime.progressAnimationFrame = requestAnimationFrame(tick);
       });
     }
 
@@ -1434,11 +1438,52 @@
       loadingSubline.textContent = step.subline;
     }
 
-    function finishLoading() {
-      clearInterval(timer);
-      clearTimeout(completionTimer);
-      timer = null;
-      completionTimer = null;
+    function stopLoadingLoop() {
+      if (runtime.timer) {
+        clearInterval(runtime.timer);
+        runtime.timer = null;
+      }
+    }
+
+    function resolveErrorMessage(error) {
+      if (error && error.message) {
+        return error.message;
+      }
+      return "请确认 API Base URL、CORS 和后端服务是否可用。";
+    }
+
+    function applyErrorState(error) {
+      stopLoadingLoop();
+      shell.classList.add("is-loading");
+      shell.classList.remove("is-complete");
+      loaderFireworks.hidden = true;
+      loadingChip.textContent = "失败";
+      loaderCenterIcon.textContent = "priority_high";
+      progressTitle.textContent = "连接未完成";
+      progressMessage.textContent = resolveErrorMessage(error);
+      progressEta.textContent = "";
+      loadingHeadline.textContent = "生成失败";
+      loadingSubline.textContent = "检查后端地址、跨域和服务状态后，可再次点击开始生成。";
+      bottomNote.textContent = "如果是本地联调，请先设置 instantFoodApiBaseUrl，再重试。";
+    }
+
+    function openResultRoute() {
+      const directResultUrl = "艺术的诞生.html";
+
+      if (window.parent && window.parent !== window) {
+        try {
+          if (window.parent.location.hash !== "#result") {
+            window.parent.location.hash = "#result";
+            return;
+          }
+        } catch (error) {}
+      }
+
+      window.location.replace(directResultUrl);
+    }
+
+    function finishLoading(result) {
+      stopLoadingLoop();
       setLoaderProgress(100, 1250).then(() => {
         shell.classList.add("is-complete");
         loaderFireworks.hidden = false;
@@ -1450,13 +1495,18 @@
         loadingHeadline.textContent = "菜品完成";
         loadingSubline.textContent = "可以查看结果";
         bottomNote.textContent = "生成完成，可查看结果。";
+        hydrateBoardPreview(result);
+        window.setTimeout(openResultRoute, 680);
       });
     }
 
-    function hydrateBoardPreview() {
+    function hydrateBoardPreview(result) {
       const params = new URLSearchParams(window.location.search);
+      const currentResult = result || (bridge ? bridge.readGenerationResult(window) : null);
       const previewCandidates = [
         params.get("boardPreview"),
+        currentResult && currentResult.boardPreview,
+        currentResult && currentResult.imageUrl,
         sessionStorage.getItem("generatedBoardPreview"),
         "../../assets/backgrounds/cd6773b8370a4aeb11f456bd974ed96c.jpg",
         "../../assets/backgrounds/3.jpg",
@@ -1559,53 +1609,91 @@
       }
     }
 
-    function startLoading() {
-      if (shell.classList.contains("is-loading")) {
-        return;
-      }
-
-      shell.classList.add("is-loading");
-      bottomNote.textContent = "食材已确认，正在把这份草图翻译成真正的成品摆盘。";
-      applyState(states[0]);
-
-      timer = setInterval(() => {
-        index = (index + 1) % states.length;
-        applyState(states[index]);
-      }, 2200);
-    }
-
-    function startLoadingSequence() {
-      if (shell.classList.contains("is-loading")) {
-        return;
-      }
-
-      clearInterval(timer);
-      clearTimeout(completionTimer);
-      timer = null;
-      completionTimer = null;
-      index = 0;
+    function startVisualLoading(sourceLabel) {
+      stopLoadingLoop();
+      runtime.index = 0;
       shell.classList.add("is-loading");
       shell.classList.remove("is-complete");
       loaderFireworks.hidden = true;
-      loadingChip.textContent = "已确认";
+      loadingChip.textContent = "生成中";
       loaderCenterIcon.textContent = "bolt";
-      bottomNote.textContent = "正在生成，请稍候。";
-      displayProgress = 0;
+      bottomNote.textContent = sourceLabel === "image"
+        ? "正在根据拍摄图片识别食材并生成成品。"
+        : "正在根据确认后的食材、工具和风味生成成品。";
+      runtime.displayProgress = 0;
       renderLoaderProgress(0);
       applyState(states[0]);
 
-      timer = setInterval(() => {
-        index += 1;
+      runtime.timer = setInterval(() => {
+        if (runtime.index < states.length - 1) {
+          runtime.index += 1;
+        }
+        applyState(states[runtime.index]);
+      }, 2200);
+    }
 
-        if (index >= states.length) {
-          clearInterval(timer);
-          timer = null;
-          completionTimer = setTimeout(finishLoading, 1200);
-          return;
+    function buildGenerationRequest() {
+      const capturedImage = bridge ? bridge.readCapturedImage(window) : "";
+      if (capturedImage) {
+        return {
+          source: "image",
+          path: "/api/v1/generate/from-image",
+          body: {
+            image_base64: capturedImage
+          }
+        };
+      }
+
+      const selection = bridge ? bridge.readSelection(window) : null;
+      if (!selection) {
+        return null;
+      }
+
+      return {
+        source: "selection",
+        path: "/api/v1/generate/recipe",
+        body: bridge ? bridge.buildRecipePayload(selection) : selection
+      };
+    }
+
+    async function startLoadingSequence() {
+      if (runtime.requestInFlight) {
+        return;
+      }
+
+      const request = buildGenerationRequest();
+      if (!request) {
+        applyErrorState(new Error("没有找到可提交的图片或食材选择。"));
+        return;
+      }
+
+      runtime.requestInFlight = true;
+      if (bridge) {
+        bridge.clearGenerationResult(window);
+      }
+
+      startVisualLoading(request.source);
+
+      try {
+        const apiUrl = bridge ? bridge.buildApiUrl(request.path, window) : request.path;
+        const result = bridge
+          ? await bridge.fetchJson(apiUrl, {
+              method: "POST",
+              body: JSON.stringify(request.body)
+            })
+          : {};
+
+        if (bridge) {
+          bridge.writeGenerationResult(result, window);
         }
 
-        applyState(states[index]);
-      }, 2200);
+        finishLoading(result);
+      } catch (error) {
+        console.error("generation-request-failed", error);
+        applyErrorState(error);
+      } finally {
+        runtime.requestInFlight = false;
+      }
     }
 
     confirmButtons.forEach((button) => {
@@ -1616,11 +1704,11 @@
     hydrateBoardPreview();
 
     loaderFireworks.hidden = true;
-    displayProgress = 0;
+    runtime.displayProgress = 0;
     renderLoaderProgress(0);
 
     if (new URLSearchParams(window.location.search).has("autoload")) {
-      startLoadingSequence();
+      void startLoadingSequence();
     }
   </script>
 </body>

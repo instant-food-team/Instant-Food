@@ -840,6 +840,11 @@
               /const\s+routeFiles\s*=\s*\{\s*\}\s*;/,
               'const routeFiles = { camera: "拍摄.html" };'
             );
+        } else if (stage === "stage3") {
+          shellMarkup = shellMarkup.replace(
+            /const\s+routeFiles\s*=\s*\{\s*\}\s*;/,
+            'const routeFiles = { loading: "加载过渡.html", result: "艺术的诞生.html" };'
+          );
         }
         const shellInitialHash = subRoute ? "#" + subRoute : "";
         const shellBaseHref = escapeHtmlAttr(document.baseURI.split("#")[0]);

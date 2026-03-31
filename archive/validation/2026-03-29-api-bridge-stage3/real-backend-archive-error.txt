@@ -1,0 +1,8 @@
+﻿Invoke-WebRequest : {"detail":"Invalid API key"}
+At line:2 char:211
++ ... y { $resp = Invoke-WebRequest -Uri 'http://127.0.0.1:8000/api/v1/arch ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidOperation: (System.Net.HttpWebRequest:HttpWebRequest) [Invoke-WebRequest], WebExc 
+   eption
+    + FullyQualifiedErrorId : WebCmdletWebResponseException,Microsoft.PowerShell.Commands.InvokeWebRequestCommand
+
