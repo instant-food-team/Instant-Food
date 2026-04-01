@@ -27,10 +27,15 @@ async def lifespan(app: FastAPI):
     # 启动时
     logger.info("拍立食后端服务启动中...")
     logger.info(f"环境: {settings.app_env}")
+<<<<<<< HEAD
     logger.info(f"AI 服务: {ai.provider_name}")
     
+=======
+    logger.info(f"AI 服务: {settings.ai_provider}")
+
+>>>>>>> 51a614dd83ddd58cde631993ed292f06df3aac49
     yield
-    
+
     # 关闭时
     logger.info("拍立食后端服务关闭中...")
 
