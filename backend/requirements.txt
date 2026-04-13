@@ -1,0 +1,23 @@
+# 拍立食后端依赖
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+python-multipart==0.0.6
+supabase==2.18.1
+sqlalchemy==2.0.37
+google-generativeai==0.8.5
+openai>=1.0.0,<2.0.0
+anthropic>=0.39.0,<1.0.0
+pydantic==2.11.7
+pydantic-settings==2.11.0
+python-dotenv==1.0.0
+<<<<<<< HEAD
+httpx==0.27.2
+tenacity==8.2.3
+websockets==15.0.1
+=======
+# httpx 0.26.0 introduced the `proxy=` client argument used by gotrue 2.9.x.
+httpx==0.26.0
+tenacity==8.2.3
+
+# Logging &
+>>>>>>> 51a614dd83ddd58cde631993ed292f06df3aac49

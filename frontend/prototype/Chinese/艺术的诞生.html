@@ -610,15 +610,215 @@
 </div>
 </div>
 </div></div>
+<script src="instant-food-api-bridge.js"></script>
 <script>
   (function () {
+    const bridge = window.InstantFoodApiBridge;
     const heroImage = document.getElementById("resultHeroImage");
     const textFallback = document.getElementById("resultTextFallback");
     const resultCopyBlock = document.getElementById("resultCopyBlock");
     const resultScroller = document.querySelector("main");
-    const recipeStepRows = Array.from(document.querySelectorAll(".recipe-step-row"));
     const params = new URLSearchParams(window.location.search);
-    const previewSrc = params.get("boardPreview") || sessionStorage.getItem("generatedBoardPreview") || heroImage.dataset.defaultSrc;
+    const titleNode = resultCopyBlock.querySelector("h2");
+    const summaryNode = resultCopyBlock.querySelector(".mb-6 p");
+    const metricChips = Array.from(resultCopyBlock.querySelectorAll(".flex.justify-center.gap-3.mb-8 > div"));
+    const stepSummaryNode = resultCopyBlock.querySelector(".recipe-step-summary");
+    const stepsPanel = resultCopyBlock.querySelector(".recipe-steps-panel");
+    const saveButton = document.querySelector(".absolute.bottom-0 button");
+    const selection = bridge ? bridge.readSelection(window) : null;
+    const generatedResult = bridge ? bridge.readGenerationResult(window) : null;
+    let recipeStepRows = [];
+
+    function escapeHtml(value) {
+      return String(value == null ? "" : value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function getVisibleSelectionIngredients() {
+      return Array.isArray(selection && selection.ingredients)
+        ? selection.ingredients.filter((item) => item && item.included !== false && String(item.name || "").trim())
+        : [];
+    }
+
+    function getRecipeIngredients(result) {
+      const recipeIngredients = Array.isArray(result && result.recipe && result.recipe.ingredients)
+        ? result.recipe.ingredients
+        : [];
+
+      if (recipeIngredients.length) {
+        return recipeIngredients
+          .map((item) => {
+            const name = String(item && item.name || "").trim();
+            const quantity = [item && item.quantity, item && item.unit].filter(Boolean).join(" ").trim();
+            return { name, quantity: quantity || "适量" };
+          })
+          .filter((item) => item.name);
+      }
+
+      return getVisibleSelectionIngredients().map((item) => ({
+        name: String(item.name || "").trim(),
+        quantity: [item.count, item.unit].filter(Boolean).join(" ").trim() || "适量"
+      }));
+    }
+
+    function resolvePreviewSrc(result) {
+      return (
+        params.get("boardPreview") ||
+        (result && (result.boardPreview || result.imageUrl)) ||
+        sessionStorage.getItem("generatedBoardPreview") ||
+        heroImage.dataset.defaultSrc
+      );
+    }
+
+    function formatDuration(result) {
+      const steps = Array.isArray(result && result.steps) ? result.steps : [];
+      const explicitMinutes = steps.reduce((sum, step) => {
+        const value = Number(step && step.duration_minutes);
+        return sum + (Number.isFinite(value) ? value : 0);
+      }, 0);
+
+      if (explicitMinutes > 0) {
+        return explicitMinutes + " 分钟";
+      }
+
+      if (steps.length) {
+        return steps.length + " 步";
+      }
+
+      return "即刻生成";
+    }
+
+    function formatTechnique(result) {
+      return (
+        (result && result.recognition && result.recognition.cooking_method) ||
+        (selection && selection.technique) ||
+        "AI 生成"
+      );
+    }
+
+    function buildStepChips(step, index) {
+      const chips = [];
+      if (step && step.duration_minutes) {
+        chips.push({ strong: step.duration_minutes + " 分钟", label: "预计时长" });
+      }
+      if (selection && selection.technique) {
+        chips.push({ strong: selection.technique, label: "主要技法" });
+      }
+      if (Array.isArray(selection && selection.tastes) && selection.tastes[index]) {
+        chips.push({ strong: selection.tastes[index], label: "风味方向" });
+      } else if (Array.isArray(selection && selection.tastes) && selection.tastes.length) {
+        chips.push({ strong: selection.tastes[0], label: "风味方向" });
+      }
+
+      if (!chips.length) {
+        chips.push({ strong: "按步骤完成", label: "生成建议" });
+      }
+
+      return chips.slice(0, 3);
+    }
+
+    function buildFallbackHtml(result) {
+      const ingredients = getRecipeIngredients(result).slice(0, 3);
+      const tastes = Array.isArray(selection && selection.tastes) ? selection.tastes : [];
+      const technique = formatTechnique(result);
+
+      return `
+        <div class="result-fallback-card w-full max-w-[276px] rounded-[28px] border border-white/10 px-5 py-4 text-white">
+          <div class="text-[11px] uppercase tracking-[0.28em] text-[#c7a46a]/85 mb-4">文字版替代</div>
+          <div class="space-y-3 text-[13px] leading-5">
+            ${ingredients.map((item) => `
+              <div class="flex items-start justify-between gap-4 border-b border-white/8 pb-2">
+                <span class="font-semibold text-white">${escapeHtml(item.name)}</span>
+                <span class="whitespace-nowrap text-[#c7a46a]">${escapeHtml(item.quantity)}</span>
+              </div>
+            `).join("")}
+            <div class="pt-2 text-[#c7a46a]/85 text-[11px] uppercase tracking-[0.24em]">做法与口味</div>
+            <div class="flex items-start justify-between gap-4 border-b border-white/8 pb-2">
+              <span class="font-semibold text-white">做法</span>
+              <span class="whitespace-nowrap text-[#c7a46a]">${escapeHtml(technique)}</span>
+            </div>
+            <div class="flex items-start justify-between gap-4 border-b border-white/8 pb-2">
+              <span class="font-semibold text-white">口味</span>
+              <span class="whitespace-nowrap text-[#c7a46a]">${escapeHtml(tastes.join(" / ") || "家常")}</span>
+            </div>
+            <div class="flex items-start justify-between gap-4 pt-2 text-[12px] text-white/65">
+              <span>生成方向</span>
+              <span class="whitespace-nowrap text-right">${escapeHtml((result && result.title) || "成品摆盘")}</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderMetricChip(container, icon, label) {
+      if (!container) {
+        return;
+      }
+
+      container.innerHTML = `
+        <span class="material-symbols-outlined text-accent text-[18px]">${escapeHtml(icon)}</span>
+        ${escapeHtml(label)}
+      `;
+    }
+
+    function renderSteps(result) {
+      const steps = Array.isArray(result && result.steps) ? result.steps : [];
+      if (!stepsPanel || !steps.length) {
+        return;
+      }
+
+      stepsPanel.innerHTML = steps.map((step, index) => {
+        const chips = buildStepChips(step, index);
+        return `
+          <article class="recipe-step-row${index === 0 ? " is-active" : ""}">
+            <div class="recipe-step-marker" aria-hidden="true"></div>
+            <div class="recipe-step-content min-w-0 flex-1">
+              <p class="recipe-step-overline">步骤 ${String(index + 1).padStart(2, "0")}</p>
+              <h4 class="recipe-step-title">${escapeHtml(step && step.title || ("步骤 " + (index + 1)))}</h4>
+              <div class="recipe-step-chips">
+                ${chips.map((chip) => `
+                  <span class="recipe-step-chip"><strong>${escapeHtml(chip.strong)}</strong><span>${escapeHtml(chip.label)}</span></span>
+                `).join("")}
+              </div>
+              <p class="recipe-step-copy">${escapeHtml(step && step.instruction || step && step.tips || "按当前生成建议完成即可。")}</p>
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function renderResult(result) {
+      if (!result) {
+        return;
+      }
+
+      const title = result.title || (result.recipe && (result.recipe.title_zh || result.recipe.title)) || "生成结果";
+      const summary = result.summary || (result.recipe && result.recipe.description) || "这道成品已经准备好进入结果页。";
+
+      if (titleNode) {
+        titleNode.textContent = title;
+      }
+
+      if (summaryNode) {
+        summaryNode.textContent = summary;
+      }
+
+      renderMetricChip(metricChips[0], "schedule", formatDuration(result));
+      renderMetricChip(metricChips[1], "local_fire_department", formatTechnique(result));
+
+      if (stepSummaryNode) {
+        stepSummaryNode.textContent =
+          (result.recipe && result.recipe.tips) ||
+          "生成结果已经写入主链路，按步骤操作即可落盘。";
+      }
+
+      textFallback.innerHTML = buildFallbackHtml(result);
+      renderSteps(result);
+    }
 
     function setActiveStep(index) {
       recipeStepRows.forEach((row, rowIndex) => {
@@ -682,6 +882,90 @@
       resultCopyBlock.style.marginTop = "0";
     }
 
+    function updateResultButtonState(saved, saving) {
+      if (!saveButton) {
+        return;
+      }
+
+      const label = saveButton.querySelector("span:not(.material-symbols-outlined)");
+      const icon = saveButton.querySelector(".material-symbols-outlined");
+
+      if (label) {
+        if (saving) {
+          label.textContent = "保存中...";
+        } else {
+          label.textContent = saved ? "已保存到档案馆" : "保存到档案馆";
+        }
+      }
+
+      if (icon) {
+        icon.textContent = saving ? "progress_activity" : (saved ? "check" : "bookmark");
+      }
+
+      saveButton.style.background = saved
+        ? "linear-gradient(180deg, rgba(100, 185, 156, 0.98), rgba(35, 83, 71, 0.98))"
+        : "";
+      saveButton.style.boxShadow = saved
+        ? "0 18px 36px rgba(35, 83, 71, 0.32)"
+        : "";
+      saveButton.disabled = Boolean(saving);
+    }
+
+    async function handleArchiveSave(event) {
+      if (!saveButton || !bridge) {
+        return;
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+      if (typeof event.stopImmediatePropagation === "function") {
+        event.stopImmediatePropagation();
+      }
+
+      if (saveButton.dataset.archiveSaving === "true") {
+        return;
+      }
+
+      const currentResult = bridge.readGenerationResult(window);
+      if (!currentResult) {
+        window.alert("当前还没有可保存的生成结果。");
+        return;
+      }
+
+      saveButton.dataset.archiveSaving = "true";
+      updateResultButtonState(false, true);
+
+      try {
+        const payload = {
+          user_id: bridge.getUserId(window),
+          title: currentResult.title || (currentResult.recipe && (currentResult.recipe.title_zh || currentResult.recipe.title)) || "生成结果",
+          recipe_id: currentResult.recipe_id || (currentResult.recipe && currentResult.recipe.id) || null,
+          generation_log_id: currentResult.generation_log_id || null,
+          cover_image_url: currentResult.imageUrl || currentResult.boardPreview || "",
+          is_shared: false
+        };
+
+        await bridge.fetchJson(bridge.buildApiUrl("/api/v1/archives", window), {
+          method: "POST",
+          body: JSON.stringify(payload)
+        });
+
+        saveButton.dataset.archiveSaved = "true";
+        updateResultButtonState(true, false);
+        window.requestAnimationFrame(() => updateResultButtonState(true, false));
+        window.setTimeout(() => updateResultButtonState(true, false), 240);
+      } catch (error) {
+        console.error("archive-save-failed", error);
+        updateResultButtonState(false, false);
+        window.alert(error && error.message ? error.message : "保存到档案馆失败，请稍后重试。");
+      } finally {
+        saveButton.dataset.archiveSaving = "false";
+      }
+    }
+
+    renderResult(generatedResult);
+    const previewSrc = resolvePreviewSrc(generatedResult);
+
     heroImage.addEventListener("load", () => {
       heroImage.hidden = false;
       textFallback.hidden = true;
@@ -696,6 +980,12 @@
       showFallback();
     }
 
+    if (saveButton) {
+      updateResultButtonState(saveButton.dataset.archiveSaved === "true", false);
+      saveButton.addEventListener("click", handleArchiveSave, true);
+    }
+
+    recipeStepRows = Array.from(document.querySelectorAll(".recipe-step-row"));
     if (recipeStepRows.length) {
       if (resultScroller && resultScroller.scrollHeight > resultScroller.clientHeight) {
         resultScroller.addEventListener("scroll", updateActiveStepByScroll, { passive: true });
